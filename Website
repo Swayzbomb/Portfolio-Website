@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VISUAL ARCHIVE — Minimalist Photography Portfolio</title>
+    <style>
+        /* ==========================================================================
+           DESIGN TOKENS & RESET (Zero External Dependencies)
+           ========================================================================== */
+        :root {
+            --bg-primary: #faf9f6;
+            --bg-secondary: #f2f0eb;
+            --bg-card: #e8e5de;
+            --bg-dark: #161514;
+            --bg-dark-elevated: #22201e;
+            --text-primary: #181715;
+            --text-secondary: #5c5852;
+            --text-muted: #8c867e;
+            --text-inverse: #f7f6f2;
+            --text-inverse-muted: #a39e96;
+            --border-light: #e2dfd7;
+            --border-dark: #2e2b28;
+            --accent: #181715;
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-serif: "Georgia", "Times New Roman", Times, serif;
+            --transition-fast: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-smooth: 420ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        button {
+            font-family: inherit;
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+        }
+
+        /* ==========================================================================
+           LAYOUT UTILITIES
+           ========================================================================== */
+        .container {
+            width: 100%;
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        @media (min-width: 640px) {
+            .container {
+                padding: 0 2.5rem;
+            }
+        }
+
+        .page-view {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            opacity: 1;
+            transition: opacity 250ms ease;
+        }
+
+        .page-view.hidden {
+            display: none;
+            opacity: 0;
+        }
+
+        .main-content {
+            flex: 1 0 auto;
+            padding-bottom: 5rem;
+        }
+
+        /* ==========================================================================
+           LANDING PAGE HEADER
+           ========================================================================== */
+        .landing-header {
+            padding: 4.5rem 1.5rem 3.5rem;
+            text-align: center;
+            max-width: 820px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 768px) {
+            .landing-header {
+                padding: 6rem 2.5rem 4.5rem;
+            }
+        }
+
+        .eyebrow {
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .main-title {
+            font-family: var(--font-serif);
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 400;
+            letter-spacing: 0.08em;
+            line-height: 1.1;
+            color: var(--text-primary);
+            margin-bottom: 1.25rem;
+        }
+
+        .main-subtitle {
+            font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+            font-weight: 300;
+            color: var(--text-secondary);
+            max-width: 560px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        .header-divider {
+            width: 48px;
+            height: 1px;
+            background-color: var(--border-light);
+            margin: 2rem auto 0;
+        }
+
+        /* ==========================================================================
+           SQUARE ALBUM GRID (LANDING PAGE)
+           ========================================================================== */
+        .albums-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.75rem;
+        }
+
+        @media (min-width: 600px) {
+            .albums-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 2rem;
+            }
+        }
+
+        @media (min-width: 960px) {
+            .albums-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 2.25rem;
+            }
+        }
+
+        .album-card {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            background-color: var(--bg-card);
+            cursor: pointer;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+        }
+
+        .album-card:hover,
+        .album-card:focus-visible {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
+            outline: 2px solid var(--text-primary);
+            outline-offset: 4px;
+        }
+
+        .album-card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .album-card:hover .album-card-img {
+            transform: scale(1.06);
+        }
+
+        .album-card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                to top,
+                rgba(18, 17, 16, 0.85) 0%,
+                rgba(18, 17, 16, 0.25) 48%,
+                rgba(18, 17, 16, 0.12) 100%
+            );
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 1.5rem;
+            transition: background var(--transition-fast);
+        }
+
+        .album-card:hover .album-card-overlay {
+            background: linear-gradient(
+                to top,
+                rgba(18, 17, 16, 0.92) 0%,
+                rgba(18, 17, 16, 0.35) 55%,
+                rgba(18, 17, 16, 0.18) 100%
+            );
+        }
+
+        .album-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .album-badge {
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.92);
+            background: rgba(22, 21, 20, 0.48);
+            padding: 0.35rem 0.65rem;
+            border-radius: var(--radius-sm);
+            backdrop-filter: blur(4px);
+        }
+
+        .album-arrow {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.16);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(4px);
+            transition: opacity var(--transition-fast), transform var(--transition-fast), background var(--transition-fast);
+        }
+
+        .album-card:hover .album-arrow {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .album-card-bottom {
+            color: #ffffff;
+        }
+
+        .album-card-meta {
+            font-size: 0.7rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.72);
+            margin-bottom: 0.35rem;
+        }
+
+        .album-card-title {
+            font-family: var(--font-serif);
+            font-size: 1.65rem;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            line-height: 1.2;
+            color: #ffffff;
+        }
+
+        .album-card-sub {
+            font-size: 0.82rem;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 0.35rem;
+            opacity: 0.85;
+        }
+
+        /* ==========================================================================
+           DEDICATED ALBUM PAGE VIEW
+           ========================================================================== */
+        .album-page-header {
+            padding-top: 2.25rem;
+            padding-bottom: 3rem;
+        }
+
+        .top-nav-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--text-primary);
+            padding: 0.65rem 1rem 0.65rem 0;
+            transition: color var(--transition-fast), transform var(--transition-fast);
+        }
+
+        .back-btn:hover {
+            color: var(--text-secondary);
+            transform: translateX(-3px);
+        }
+
+        .album-series-label {
+            font-size: 0.72rem;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .album-hero-info {
+            max-width: 720px;
+        }
+
+        .album-page-title {
+            font-family: var(--font-serif);
+            font-size: clamp(2.25rem, 5vw, 3.75rem);
+            font-weight: 400;
+            line-height: 1.12;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .album-page-desc {
+            font-size: 1.02rem;
+            font-weight: 300;
+            color: var(--text-secondary);
+            line-height: 1.75;
+            margin-bottom: 1.5rem;
+        }
+
+        .album-page-meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.85rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .meta-dot {
+            color: var(--border-light);
+        }
+
+        /* Album Photo Gallery Grid */
+        .photo-gallery-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.75rem;
+        }
+
+        @media (min-width: 768px) {
+            .photo-gallery-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 2.25rem;
+            }
+        }
+
+        .photo-item {
+            background-color: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+            cursor: zoom-in;
+            transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+        }
+
+        .photo-item.wide {
+            grid-column: 1 / -1;
+        }
+
+        .photo-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+        }
+
+        .photo-frame {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            overflow: hidden;
+            background-color: var(--bg-card);
+        }
+
+        .photo-item.wide .photo-frame {
+            aspect-ratio: 16 / 9;
+        }
+
+        @media (max-width: 640px) {
+            .photo-item.wide .photo-frame {
+                aspect-ratio: 4 / 3;
+            }
+        }
+
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 650ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .photo-item:hover .photo-frame img {
+            transform: scale(1.03);
+        }
+
+        .photo-caption-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 0.95rem 1.25rem;
+            background-color: var(--bg-primary);
+            border-top: 1px solid var(--border-light);
+        }
+
+        .photo-title {
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .photo-specs {
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            text-align: right;
+        }
+
+        /* ==========================================================================
+           PROMINENT BOTTOM HEADER (FOOTER NAVIGATION BAR ON EVERY PAGE)
+           ========================================================================== */
+        .bottom-header {
+            background-color: var(--bg-dark);
+            color: var(--text-inverse);
+            border-top: 1px solid var(--border-dark);
+            margin-top: auto;
+            width: 100%;
+        }
+
+        .bottom-header-inner {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 3.5rem 1.5rem 2.75rem;
+        }
+
+        @media (min-width: 640px) {
+            .bottom-header-inner {
+                padding: 4.25rem 2.5rem 3rem;
+            }
+        }
+
+        .bottom-header-top {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2.5rem;
+            padding-bottom: 2.75rem;
+            border-bottom: 1px solid var(--border-dark);
+        }
+
+        @media (min-width: 768px) {
+            .bottom-header-top {
+                grid-template-columns: 1.2fr 1.5fr 1fr;
+                gap: 3rem;
+            }
+        }
+
+        .bottom-brand-title {
+            font-family: var(--font-serif);
+            font-size: 1.65rem;
+            letter-spacing: 0.08em;
+            color: var(--text-inverse);
+            display: inline-block;
+            margin-bottom: 0.65rem;
+            text-align: left;
+            transition: opacity var(--transition-fast);
+        }
+
+        .bottom-brand-title:hover {
+            opacity: 0.8;
+        }
+
+        .bottom-brand-tagline {
+            font-size: 0.85rem;
+            font-weight: 300;
+            color: var(--text-inverse-muted);
+            line-height: 1.6;
+            max-width: 280px;
+        }
+
+        .bottom-nav-heading {
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.24em;
+            text-transform: uppercase;
+            color: var(--text-inverse-muted);
+            margin-bottom: 1.1rem;
+        }
+
+        .bottom-album-links {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.65rem 1.25rem;
+        }
+
+        .bottom-link {
+            font-size: 0.84rem;
+            color: var(--text-inverse);
+            text-align: left;
+            padding: 0.2rem 0;
+            opacity: 0.82;
+            transition: opacity var(--transition-fast), transform var(--transition-fast);
+        }
+
+        .bottom-link:hover {
+            opacity: 1;
+            transform: translateX(3px);
+        }
+
+        .bottom-link.active-album-link {
+            opacity: 1;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+        }
+
+        .bottom-contact-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .bottom-header-bar {
+            padding-top: 1.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: var(--text-inverse-muted);
+        }
+
+        @media (min-width: 640px) {
+            .bottom-header-bar {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+        }
+
+        .bottom-quick-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+        }
+
+        .bottom-quick-actions button {
+            color: var(--text-inverse);
+            opacity: 0.85;
+            transition: opacity var(--transition-fast);
+        }
+
+        .bottom-quick-actions button:hover {
+            opacity: 1;
+        }
+
+        /* ==========================================================================
+           FULL-SCREEN LIGHTBOX VIEWER
+           ========================================================================== */
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background-color: rgba(12, 11, 10, 0.96);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 1.25rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 250ms ease;
+        }
+
+        @media (min-width: 640px) {
+            .lightbox {
+                padding: 2rem;
+            }
+        }
+
+        .lightbox.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .lightbox-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 10;
+        }
+
+        .lightbox-counter {
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-inverse-muted);
+        }
+
+        .lightbox-close {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background var(--transition-fast);
+        }
+
+        .lightbox-close:hover {
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        .lightbox-stage {
+            position: relative;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 1rem 0;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .lightbox-img {
+            max-height: 72vh;
+            max-width: calc(100vw - 6.5rem);
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: var(--radius-sm);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
+            transition: opacity 160ms ease;
+        }
+
+        @media (max-width: 640px) {
+            .lightbox-img {
+                max-width: calc(100vw - 2.5rem);
+                max-height: 65vh;
+            }
+        }
+
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background var(--transition-fast), transform var(--transition-fast);
+            z-index: 10;
+        }
+
+        .lightbox-nav:hover {
+            background: rgba(255, 255, 255, 0.22);
+        }
+
+        .lightbox-prev {
+            left: 0.25rem;
+        }
+
+        .lightbox-next {
+            right: 0.25rem;
+        }
+
+        .lightbox-bottom {
+            text-align: center;
+            z-index: 10;
+        }
+
+        .lightbox-caption-title {
+            font-family: var(--font-serif);
+            font-size: 1.25rem;
+            color: #ffffff;
+            margin-bottom: 0.25rem;
+        }
+
+        .lightbox-caption-meta {
+            font-size: 0.72rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--text-inverse-muted);
+        }
+
+        /* ==========================================================================
+           NON-INTRUSIVE TOAST MESSAGE
+           ========================================================================== */
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 1100;
+            background-color: var(--bg-dark);
+            color: var(--text-inverse);
+            border: 1px solid var(--border-dark);
+            padding: 0.85rem 1.25rem;
+            border-radius: var(--radius-md);
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+            transform: translateY(120%);
+            opacity: 0;
+            transition: transform 260ms ease, opacity 260ms ease;
+            pointer-events: none;
+        }
+
+        .toast.visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ======================================================================
+         PAGE 1: LANDING PAGE VIEW
+         ====================================================================== -->
+    <div id="landing-page" class="page-view">
+        <header class="landing-header">
+            <p class="eyebrow">Curated Photography Index &bull; 2022–2026</p>
+            <h1 class="main-title">VISUAL ARCHIVE</h1>
+            <p class="main-subtitle">
+                A quiet study of architectural geometry, northern silence, and human presence across six photographic monographs.
+            </p>
+            <div class="header-divider"></div>
+        </header>
+
+        <main class="main-content">
+            <div class="container">
+                <section id="albums-grid" class="albums-grid" aria-label="Photography Albums">
+                    <!-- Square (1:1) Album Cards rendered by JS -->
+                </section>
+            </div>
+        </main>
+
+        <!-- Prominent Bottom Header on Landing Page -->
+        <div id="landing-bottom-header"></div>
+    </div>
+
+    <!-- ======================================================================
+         PAGE 2: DEDICATED ALBUM PAGE VIEW
+         ====================================================================== -->
+    <div id="album-page" class="page-view hidden">
+        <div class="container">
+            <header class="album-page-header">
+                <nav class="top-nav-bar" aria-label="Album Top Navigation">
+                    <button type="button" class="back-btn" onclick="showLandingPage()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <line x1="19" y1="12" x2="5" y2="12"></line>
+                            <polyline points="12 19 5 12 12 5"></polyline>
+                        </svg>
+                        <span>Back to Albums</span>
+                    </button>
+                    <span id="album-series-tag" class="album-series-label">Series 01</span>
+                </nav>
+
+                <div class="album-hero-info">
+                    <h1 id="album-title" class="album-page-title">Album Title</h1>
+                    <p id="album-description" class="album-page-desc">Album description.</p>
+                    <div class="album-page-meta-row">
+                        <span id="album-location">Location</span>
+                        <span class="meta-dot">&bull;</span>
+                        <span id="album-year">Year</span>
+                        <span class="meta-dot">&bull;</span>
+                        <span id="album-count">0 Plates</span>
+                    </div>
+                </div>
+            </header>
+        </div>
+
+        <main class="main-content">
+            <div class="container">
+                <section id="album-gallery" class="photo-gallery-grid" aria-label="Album Photographs">
+                    <!-- Album Photographs rendered by JS -->
+                </section>
+            </div>
+        </main>
+
+        <!-- Prominent Bottom Header on Every Album Page -->
+        <div id="album-bottom-header"></div>
+    </div>
+
+    <!-- ======================================================================
+         FULL-SCREEN LIGHTBOX VIEWER
+         ====================================================================== -->
+    <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Image Lightbox Viewer">
+        <div class="lightbox-top">
+            <div class="lightbox-counter">
+                <span id="lb-counter">1 / 4</span>
+                <span style="margin: 0 0.6rem; opacity: 0.4;">|</span>
+                <span id="lb-album-title">Album</span>
+            </div>
+            <button type="button" class="lightbox-close" onclick="closeLightbox()" aria-label="Close viewer">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="lightbox-stage">
+            <button type="button" class="lightbox-nav lightbox-prev" onclick="prevLightboxPhoto(event)" aria-label="Previous image">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+
+            <img id="lb-image" class="lightbox-img" src="" alt="">
+
+            <button type="button" class="lightbox-nav lightbox-next" onclick="nextLightboxPhoto(event)" aria-label="Next image">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </button>
+        </div>
+
+        <div class="lightbox-bottom">
+            <p id="lb-title" class="lightbox-caption-title">Plate Title</p>
+            <p id="lb-specs" class="lightbox-caption-meta">Camera Details</p>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <!-- ======================================================================
+         VANILLA JAVASCRIPT APPLICATION LOGIC
+         ====================================================================== -->
+    <script>
+        /**
+         * Procedural Fine-Art Canvas Generator
+         * Generates bespoke, high-resolution, gallery-grade architectural/landscape/minimalist
+         * art data-URIs on the fly whenever an external image is blocked or offline.
+         */
+        function generateArtFallback(title, paletteIndex, isSquare) {
+            const palettes = [
+                { bg1: '#2c3034', bg2: '#d8d3c8', accent: '#18191b', sun: '#f4efe6' }, // Urban Geometry
+                { bg1: '#2b3a42', bg2: '#cbd5dc', accent: '#162026', sun: '#eef3f6' }, // Nordic Silence
+                { bg1: '#1e1e1e', bg2: '#b8b8b8', accent: '#0e0e0e', sun: '#ececec' }, // Monochrome Portraits
+                { bg1: '#364137', bg2: '#d5dcd2', accent: '#1d241e', sun: '#f2f5f0' }, // Botanical Minimal
+                { bg1: '#141726', bg2: '#373e5c', accent: '#e07a5f', sun: '#f2cc8f' }, // Nocturne Neon
+                { bg1: '#2f4550', bg2: '#d8e2dc', accent: '#1b2830', sun: '#f8f9fa' }  // Coastal Horizons
+            ];
+            const p = palettes[paletteIndex % palettes.length];
+            const w = isSquare ? 800 : 1200;
+            const h = isSquare ? 800 : 800;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+
+            // Sky / Background gradient
+            const grad = ctx.createLinearGradient(0, 0, 0, h);
+            grad.addColorStop(0, p.bg2);
+            grad.addColorStop(1, p.bg1);
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+
+            // Subtle sun / light aperture
+            ctx.fillStyle = p.sun;
+            ctx.globalAlpha = 0.75;
+            ctx.beginPath();
+            ctx.arc(w * 0.68, h * 0.32, Math.min(w, h) * 0.14, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Minimalist geometric horizon / architectural forms
+            ctx.globalAlpha = 0.85;
+            ctx.fillStyle = p.accent;
+            ctx.fillRect(0, h * 0.64, w, h * 0.36);
+
+            ctx.globalAlpha = 0.45;
+            ctx.fillStyle = p.bg1;
+            ctx.beginPath();
+            ctx.moveTo(w * 0.12, h * 0.64);
+            ctx.lineTo(w * 0.42, h * 0.28);
+            ctx.lineTo(w * 0.65, h * 0.64);
+            ctx.closePath();
+            ctx.fill();
+
+            // Subtle fine-art border & plate label
+            ctx.globalAlpha = 0.5;
+            ctx.strokeStyle = p.sun;
+            ctx.lineWidth = 2;
+            ctx.strokeRect(36, 36, w - 72, h - 72);
+
+            ctx.globalAlpha = 0.85;
+            ctx.fillStyle = p.sun;
+            ctx.font = '500 18px Georgia, serif';
+            ctx.fillText(title.toUpperCase(), 60, h - 64);
+
+            return canvas.toDataURL('image/jpeg', 0.88);
+        }
+
+        /**
+         * Portfolio Data: 6 Curated Albums
+         */
+        const ALBUMS = [
+            {
+                id: 'urban-geometry',
+                series: 'Series 01',
+                title: 'Urban Geometry',
+                subtitle: 'Concrete symmetry & harsh midday shadow',
+                location: 'Zurich & Tokyo',
+                year: '2025',
+                paletteIndex: 0,
+                description: 'An architectural study examining brutalist facades, cantilevered concrete, and the sharp geometric dialogue between natural sunlight and contemporary urban space.',
+                cover: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=900&q=80',
+                photos: [
+                    {
+                        url: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1400&q=80',
+                        title: 'Atrium Light & Shadow',
+                        specs: 'Hasselblad X2D • 38mm f/4',
+                        wide: true
+                    },
+                    {
+                        url: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1100&q=80',
+                        title: 'Vertical Grid Study IV',
+                        specs: 'Leica Q3 • 28mm f/5.6',
+                        wide: false
+                    },
+                    {
+                        url: 'https://images.unsplash.com/photo-1511818966892-d7d671e672a2?auto=format&fit=crop&w=1100&q=80',
+                        title: 'Cantilevered Pavilion',
+                        specs: 'Leica Q3 • 28mm f/4',
+                        wide: false
+                    },
+                    {
+                        url: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?auto=format&fit=crop&w=1400&q=80',
+                        title: 'Morning Facade, Minato',
+                        specs: 'Hasselblad X2D • 55mm f/5.6',
+                        wide: true
+                    }
+                ]
+            },
+            {
+                id: 'nordic-silence',
+                series: 'Series 02',
+                title: 'Nordic Silence',
+                subtitle: 'Glacial mist & volcanic basalt shores',
+                location: 'Iceland & Lofoten',
+                year: '2024',
+                paletteIndex: 1,
+                description: 'Photographed during the prolonged blue hours of late autumn, documenting the stillness where volcanic stone meets sub-arctic tides and low mountain cloud.',
+                cover: 'https://images.unsplash.com/photo-1476610182048-b716b8518aae?auto=format&fit=crop&w=900&q=80',
+                photos: [
+                    {
+                        url: 'https://images.unsplash.com/photo-1476610182048-b716b8518aae?auto=format&fit=crop&w=1400&q=80',
+                        title: 'Highland Cascade at Dawn',
+                        specs: 'Sony A7R V • 24mm f/8',
+                        wide: true
+                    },
+                    {
+                        url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1100&q=80',
+                        title: 'Glacial Valley Reflection',
+                        specs: 'Sony A7R V • 35mm f/8',
+                        wide: false
+                    },
+                    {
+                        url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1100&q=80',
+                        title: 'Granite Ridge in Mist',
+                        specs: 'Sony A7R V • 50mm f/5.6',
+                        wide: false
+                    },
+                    {
+                        url: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?auto=format&fit=crop&w=1400&q=80',
+                        title: 'Polar Veil Over the Fjord',
+                        specs: 'Sony A7R V • 14mm f/1.8',
+                        wide: true
+                    }
+                ]
+            },
+            {
+                id: 'monochrome-portraits',
+                series: 'Series 03',
+                title: 'Monochrome Portraits',
+                subtitle: 'Unscripted human poise in natural light',
+                location: 'Paris & Vienna',
+                year: '2025',
+                paletteIndex: 2,
+                description: 'Intimate tonal studies focusing on expression, quiet contemplation, and directional window light across historic European interiors and boulevards.',
+                cover: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=900&q=80',
+                photos: [
+                    {
+                        url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1100&q=80',
+                        title: 'Afternoon Gaze, Le Marais',
+                        specs: 'Leica M11 Monochrom • 50mm f/1.4',
+                        wide: false
+                    },
+                    {
+                        url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=1100&q=80',
+                        title: 'Quiet Transit',
+                        specs: 'Leica M11 Monochrom • 35mm f/2',
+                        wide: false
+                    },
+                    {
+                        url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1400&q=80',
+                        title: 'North Window Study II',
+                        specs: 'Leica M11 Monochrom • 50mm f/2',
+                        wide: true
+                    },
+                    {
+                        url: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1400&q=80',
+                        title: 'October Walk, Innere Stadt',
+                        specs: 'Leica M11 Monochrom • 50mm f/1.4',
+                        wide: true
+                    }
+                ]
+            },
+            {
+                id: 'botanical-minimal',
+                series: 'Series 04',
+                title: 'Botanical Minimal',
+                subtitle: 'Organic stillness & negative space',
+                location: 'Kyoto & Styria',
+                year: '2023',
+                paletteIndex: 3,
+                description: 'Distilling natural forms down to texture, silhouette, and tonal restraint—observing mist-shrouded pines, desert ridges, and singular botanical silhouettes.',
+                cover: 'https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&w=900&q=80',
+                photos: [
+                    {
+                        url: 'https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&w=1400&q=80',
+                        title: 'Single Stem & Wall Shadow',
+                        specs: 'Fujifilm GFX 100S • 80mm f/2.8',
+                        wide: true
+                    },
+                    {
+                        url: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1100&q=80',
+                        title: 'Conifers in Morning Fog',
+                        specs: 'Fujifilm GFX 100S • 110mm f/4',
+                        wide: false
+                    },
+                    {
+                        url: 'https://images.unsplash.com/photo-1473580044384-7ba9967e16a0?auto=format&fit=crop&w=1100&q=80',
+                        title: 'Wind-Swept Dune Crest',
+                        specs: 'Fujifilm GFX 100S • 80mm f/5.6',
+                        wide: false
+                    },
+                    {
+                        url: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=1400&q=80',
+                        title: 'Alpine Meadow Canopy',
+                        specs: 'Fujifilm GFX 100S • 45mm f/5.6',
+                        wide: true
+                    }
+                ]
+            },
+            {
+                id: 'nocturne-neon',
+                series: 'Series 05',
+                title: 'Nocturne Neon',
+                subtitle: 'Nocturnal rain & chromatic reflections',
+                location: 'Seoul & Hong Kong',
+                year: '2026',
+                paletteIndex: 4,
+                description: 'After midnight, rain-slicked asphalt turns into a mirror for tungsten streetlamps, vapor trails, and the electric hum of quiet metropolitan alleys.',
+                cover: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=900&q=80',
+                photos: [
+                    {
+                        url: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=1400&q=80',
+                        title: 'Midnight Crossing, Shinjuku',
+                        specs: 'Leica SL2-S • 35mm f/1.4',
+                        wide: true
+                    },
+                    {
+                        url: 'https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1100&q=80',
+                        title: 'Rain Reflections in Crimson',
+                        specs: 'Leica SL2-S • 50mm f/1.4',
+                        wide: false
+                    },
+                    {
+                        url: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=1100&q=80',
+                        title: 'Lantern Alleyway, 02:15 AM',
+                        specs: 'Leica SL2-S • 35mm f/1.4',
+                        wide: false
+                    },
+                    {
+                        url: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=1400&q=80',
+                        title: 'Elevated Expressway Haze',
+                        specs: 'Leica SL2-S • 24mm f/2',
+                        wide: true
+                    }
+                ]
+            },
+            {
+                id: 'coastal-horizons',
+                series: 'Series 06',
+                title: 'Coastal Horizons',
+                subtitle: 'Long exposures along the littoral edge',
+                location: 'Cornwall & Amalfi',
+                year: '2024',
+                paletteIndex: 5,
+                description: 'Slow-shutter meditations on tidal motion, weathered limestone cliffs, and pale horizon lines where sea and sky dissolve into calm minimalism.',
+                cover: 'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&w=900&q=80',
+                photos: [
+                    {
+                        url: 'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&w=1400&q=80',
+                        title: 'Low Tide Solitude',
+                        specs: 'Hasselblad X2D • 38mm f/11 (4s)',
+                        wide: true
+                    },
+                    {
+                        url: 'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=1100&q=80',
+                        title: 'Cliffside Limestone',
+                        specs: 'Hasselblad X2D • 55mm f/8',
+                        wide: false
+                    },
+                    {
+                        url: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&w=1100&q=80',
+                        title: 'Atlantic Swell',
+                        specs: 'Hasselblad X2D • 90mm f/5.6',
+                        wide: false
+                    },
+                    {
+                        url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80',
+                        title: 'Pale Dawn Horizon',
+                        specs: 'Hasselblad X2D • 38mm f/8 (2s)',
+                        wide: true
+                    }
+                ]
+            }
+        ];
+
+        // Application State
+        let activeAlbum = null;
+        let lightboxIndex = 0;
+        let toastTimer = null;
+
+        /**
+         * Safely handles image fallback using our procedural canvas generator
+         */
+        function handleImageError(imgElement, title, paletteIndex, isSquare) {
+            imgElement.onerror = null; // Prevent infinite loop
+            imgElement.src = generateArtFallback(title, paletteIndex, isSquare);
+        }
+
+        /**
+         * Renders the Landing Page 1:1 Square Album Grid
+         */
+        function renderLandingAlbums() {
+            const gridEl = document.getElementById('albums-grid');
+            if (!gridEl) return;
+
+            gridEl.innerHTML = ALBUMS.map((album) => `
+                <article
+                    class="album-card"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Open ${album.title} album (${album.photos.length} photographs)"
+                    onclick="openAlbumPage('${album.id}')"
+                    onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openAlbumPage('${album.id}');}"
+                >
+                    <img
+                        class="album-card-img"
+                        src="${album.cover}"
+                        alt="${album.title}"
+                        loading="lazy"
+                        onerror="handleImageError(this, '${album.title.replace(/'/g, "\\'")}', ${album.paletteIndex}, true)"
+                    >
+                    <div class="album-card-overlay">
+                        <div class="album-card-top">
+                            <span class="album-badge">${album.series}</span>
+                            <span class="album-arrow" aria-hidden="true">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                </svg>
+                            </span>
+                        </div>
+                        <div class="album-card-bottom">
+                            <p class="album-card-meta">${album.photos.length} Plates &bull; ${album.year}</p>
+                            <h2 class="album-card-title">${album.title}</h2>
+                            <p class="album-card-sub">${album.subtitle}</p>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        /**
+         * Renders the Prominent Bottom Header (Footer Navigation Bar) on EVERY page
+         */
+        function renderBottomHeader(targetElementId, currentAlbumId = null) {
+            const container = document.getElementById(targetElementId);
+            if (!container) return;
+
+            const albumLinksHtml = ALBUMS.map((album) => {
+                const isActive = album.id === currentAlbumId ? 'active-album-link' : '';
+                return `
+                    <button
+                        type="button"
+                        class="bottom-link ${isActive}"
+                        onclick="openAlbumPage('${album.id}')"
+                    >
+                        ${album.title}
+                    </button>
+                `;
+            }).join('');
+
+            container.innerHTML = `
+                <footer class="bottom-header" role="contentinfo">
+                    <div class="bottom-header-inner">
+                        <div class="bottom-header-top">
+                            <div>
+                                <button type="button" class="bottom-brand-title" onclick="showLandingPage()">
+                                    VISUAL ARCHIVE
+                                </button>
+                                <p class="bottom-brand-tagline">
+                                    Fine art and architectural photography portfolio. Limited archival pigment prints available upon request.
+                                </p>
+                            </div>
+
+                            <div>
+                                <p class="bottom-nav-heading">Archive Collections</p>
+                                <nav class="bottom-album-links" aria-label="Footer Album Navigation">
+                                    <button type="button" class="bottom-link ${!currentAlbumId ? 'active-album-link' : ''}" onclick="showLandingPage()">
+                                        All Albums (Index)
+                                    </button>
+                                    ${albumLinksHtml}
+                                </nav>
+                            </div>
+
+                            <div>
+                                <p class="bottom-nav-heading">Studio &amp; Inquiries</p>
+                                <div class="bottom-contact-list">
+                                    <button type="button" class="bottom-link" onclick="copyEmail()">
+                                        studio@visualarchive.com
+                                    </button>
+                                    <button type="button" class="bottom-link" onclick="showToast('Vienna &amp; Zurich Studio — By Appointment')">
+                                        Vienna / Zurich
+                                    </button>
+                                    <button type="button" class="bottom-link" onclick="showToast('Instagram: @visual.archive')">
+                                        Instagram &nearr;
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bottom-header-bar">
+                            <p>&copy; 2026 VISUAL ARCHIVE. All rights reserved.</p>
+                            <div class="bottom-quick-actions">
+                                <button type="button" onclick="showLandingPage()">Landing Page</button>
+                                <button type="button" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">Top &uarr;</button>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            `;
+        }
+
+        /**
+         * Switches cleanly to a Dedicated Album Page View (Pure DOM switching, no pushState)
+         */
+        function openAlbumPage(albumId) {
+            const album = ALBUMS.find((a) => a.id === albumId);
+            if (!album) return;
+
+            activeAlbum = album;
+
+            // Populate album header details
+            document.getElementById('album-series-tag').textContent = album.series;
+            document.getElementById('album-title').textContent = album.title;
+            document.getElementById('album-description').textContent = album.description;
+            document.getElementById('album-location').textContent = album.location;
+            document.getElementById('album-year').textContent = album.year;
+            document.getElementById('album-count').textContent = `${album.photos.length} Photographs`;
+
+            // Render gallery grid for this album
+            const galleryEl = document.getElementById('album-gallery');
+            galleryEl.innerHTML = album.photos.map((photo, idx) => `
+                <figure
+                    class="photo-item ${photo.wide ? 'wide' : ''}"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Inspect ${photo.title} in full-screen viewer"
+                    onclick="openLightbox(${idx})"
+                    onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openLightbox(${idx});}"
+                >
+                    <div class="photo-frame">
+                        <img
+                            src="${photo.url}"
+                            alt="${photo.title}"
+                            loading="lazy"
+                            onerror="handleImageError(this, '${photo.title.replace(/'/g, "\\'")}', ${album.paletteIndex}, false)"
+                        >
+                    </div>
+                    <figcaption class="photo-caption-bar">
+                        <span class="photo-title">${photo.title}</span>
+                        <span class="photo-specs">${photo.specs}</span>
+                    </figcaption>
+                </figure>
+            `).join('');
+
+            // Update bottom header active link state for this album page
+            renderBottomHeader('album-bottom-header', album.id);
+
+            // Switch visible page view
+            const landingView = document.getElementById('landing-page');
+            const albumView = document.getElementById('album-page');
+
+            landingView.classList.add('hidden');
+            albumView.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'instant' });
+        }
+
+        /**
+         * Switches cleanly back to the Landing Page View
+         */
+        function showLandingPage() {
+            activeAlbum = null;
+
+            const landingView = document.getElementById('landing-page');
+            const albumView = document.getElementById('album-page');
+
+            albumView.classList.add('hidden');
+            landingView.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'instant' });
+        }
+
+        /**
+         * Lightbox Viewer Functions
+         */
+        function openLightbox(index) {
+            if (!activeAlbum) return;
+            lightboxIndex = index;
+            updateLightboxDisplay();
+
+            const lb = document.getElementById('lightbox');
+            lb.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            const lb = document.getElementById('lightbox');
+            lb.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        function updateLightboxDisplay() {
+            if (!activeAlbum) return;
+            const photo = activeAlbum.photos[lightboxIndex];
+            const imgEl = document.getElementById('lb-image');
+
+            imgEl.style.opacity = '0.35';
+            setTimeout(() => {
+                imgEl.onerror = function() {
+                    handleImageError(this, photo.title, activeAlbum.paletteIndex, false);
+                };
+                imgEl.src = photo.url;
+                imgEl.alt = photo.title;
+                document.getElementById('lb-counter').textContent = `${lightboxIndex + 1} / ${activeAlbum.photos.length}`;
+                document.getElementById('lb-album-title').textContent = activeAlbum.title;
+                document.getElementById('lb-title').textContent = photo.title;
+                document.getElementById('lb-specs').textContent = photo.specs;
+                imgEl.style.opacity = '1';
+            }, 90);
+        }
+
+        function nextLightboxPhoto(event) {
+            if (event) event.stopPropagation();
+            if (!activeAlbum) return;
+            lightboxIndex = (lightboxIndex + 1) % activeAlbum.photos.length;
+            updateLightboxDisplay();
+        }
+
+        function prevLightboxPhoto(event) {
+            if (event) event.stopPropagation();
+            if (!activeAlbum) return;
+            lightboxIndex = (lightboxIndex - 1 + activeAlbum.photos.length) % activeAlbum.photos.length;
+            updateLightboxDisplay();
+        }
+
+        /**
+         * Clipboard & Toast Helpers
+         */
+        function copyEmail() {
+            const email = 'studio@visualarchive.com';
+            const input = document.createElement('input');
+            input.value = email;
+            document.body.appendChild(input);
+            input.select();
+            try {
+                document.execCommand('copy');
+                showToast('Copied: studio@visualarchive.com');
+            } catch (e) {
+                showToast('Email: studio@visualarchive.com');
+            }
+            document.body.removeChild(input);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('visible');
+
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.remove('visible');
+            }, 2800);
+        }
+
+        // Keyboard navigation for Lightbox
+        document.addEventListener('keydown', (e) => {
+            const lb = document.getElementById('lightbox');
+            if (!lb.classList.contains('open')) return;
+
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowRight') nextLightboxPhoto();
+            if (e.key === 'ArrowLeft') prevLightboxPhoto();
+        });
+
+        // Close Lightbox on backdrop click
+        document.getElementById('lightbox').addEventListener('click', (e) => {
+            if (e.target.id === 'lightbox' || e.target.classList.contains('lightbox-stage')) {
+                closeLightbox();
+            }
+        });
+
+        // Initialize Portfolio on Load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderLandingAlbums();
+            renderBottomHeader('landing-bottom-header', null);
+            renderBottomHeader('album-bottom-header', null);
+        });
+    </script>
+</body>
+</html>
